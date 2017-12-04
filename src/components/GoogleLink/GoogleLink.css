@@ -1,0 +1,26 @@
+.GoogleLink{
+  max-width: 400px;
+  margin: 40vh auto;
+  font-size: 40px;
+  color: white;
+  text-align: center;
+}
+.GoogleLink-container{
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  background: #635e8a; /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+
+  /*filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#46a6fd', endColorstr='#9b41fe',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+  }
+
+.GoogleLink-link{
+  width: 100%;
+  padding: 10px 15px;
+  /* border: 1px solid white; */
+  border-radius: 5px;
+  text-align: center;
+  font-size: 25px;
+  color: inherit;
+  text-decoration: none;
+}
+
