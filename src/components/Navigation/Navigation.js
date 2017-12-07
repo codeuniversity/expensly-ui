@@ -21,6 +21,9 @@ class Navigation extends React.Component{
 
 	}
 
+  handleClose = () =>{
+     this.setState({open: false})
+  }
 
 	render(){
 		return(
@@ -32,12 +35,33 @@ class Navigation extends React.Component{
           open={this.state.open}
           onRequestChange={(open) => this.setState({open})}>
               <div className="menu-item">
-              <NavLink to="/" exact={true} activeClassName="mobile-active-link" className="nav-link Profile">
-                Home
-              </NavLink>
+                <NavLink
+                  to="/"
+                  exact={true}
+                  activeClassName="mobile-active-link"
+                  className="nav-link Profile"
+                  onClick={this.handleClose}>
+                  Home
+                </NavLink>
               </div>
               <div className="menu-item">
-              <NavLink to="/logout" exact={true} activeClassName="mobile-active-link" className="nav-link Profile">
+                <NavLink
+                  to="/add"
+                  exact={true}
+                  activeClassName="mobile-active-link"
+                  className="nav-link Profile"
+                  onClick={this.handleClose}>
+                  Add an Expense
+                </NavLink>
+              </div>
+
+              <div className="menu-item">
+              <NavLink
+                to="/logout"
+                exact={true}
+                activeClassName="mobile-active-link"
+                className="nav-link Profile"
+                onClick={this.handleClose}>
                 <div onClick={this.onLogout}>Logout</div>
               </NavLink>
               </div>
@@ -49,6 +73,9 @@ class Navigation extends React.Component{
   					<nav className="header-nav">
               <NavLink to="/" exact={true} activeClassName="active-link" className="nav-link Profile">
                 Home
+              </NavLink>
+              <NavLink to="/add" exact={true} activeClassName="active-link" className="nav-link Profile">
+                Add an Expense
               </NavLink>
               <NavLink to="/logout" exact={true} activeClassName="active-link" className="nav-link Profile">
                 <div onClick={this.onLogout}>Logout</div>

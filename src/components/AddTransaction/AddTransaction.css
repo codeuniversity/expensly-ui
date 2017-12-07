@@ -1,0 +1,28 @@
+.AddTransaction{
+}
+
+.ItemFormAdder{
+  height:40px;
+  margin:20px;
+  float: left;
+}
+.ItemFormAdder, .ItemForm-destroy{
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 500ms;
+}
+.ItemFormAdder:hover, .ItemForm-destroy:hover{
+  box-shadow: 1px 1px 1px 1px lightgray;
+  background-color: lightgray;
+}
+.ItemForm{
+  position: relative;
+}
+
+.ItemForm-destroy{
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  top:20px;
+  left:20px;
+}
