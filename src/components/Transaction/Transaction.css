@@ -1,0 +1,8 @@
+.Transaction{
+  overflow: auto;
+}
+.Transaction-time{
+  font-size: 12px;
+  margin-top: 0;
+  text-align: right;
+}

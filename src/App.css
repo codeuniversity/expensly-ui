@@ -1,5 +1,8 @@
+html{
+  font-family: 'Roboto', sans-serif;
+  background-color: #fefeff;
+}
 body{
-  background-color: #f1f1f1;
 }
 .App {
   text-align: center;
@@ -11,4 +14,17 @@ a {
 }
 .link-like{
   color: lightblue;
+}
+
+h1, h2, h3, h4, h5, h6{
+  font-weight: 200;
+}
+.light {
+  color: grey;
+}
+.expense{
+  color: red;
+}
+.marginless{
+  margin: 0;
 }
