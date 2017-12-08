@@ -10,7 +10,132 @@ import Plus from './plus.svg';
 import Minus from './minus.svg';
 import Store from '../../services/Store';
 import AutoComplete from 'material-ui/AutoComplete';
+import {
+  Step,
+  Stepper,
+  StepLabel,
+} from 'material-ui/Stepper';
+class NameStep extends React.Component{
+
+	onNameChange = (name)=>{
+		let {index, item} = this.props;
+		let newItem = Object.assign(this.props.item, {name});
+		this.props.onChange(newItem, index);
+	}
+
+	render(){
+		let {articles, item, children} = this.props;
+
+		return(
+			<div>
+				<AutoComplete
+					hintText="Item Name"
+					searchText={item.name}
+					onUpdateInput={this.onNameChange}
+					dataSource={articles.map(a=>a.name)}
+					filter={(searchText, key) => (key.indexOf(searchText) !== -1)}
+					openOnFocus={true}/>
+					{children}
+			</div>
+		)
+	}
+}
+
+class CategoryStep extends React.Component{
+	onCategoryChange = (category)=>{
+		let {index, item} = this.props;
+		let newItem = Object.assign(this.props.item, {category});
+		this.props.onChange(newItem, index);
+	}
+
+	render(){
+		let {item, categories, children} = this.props;
+		return(
+			<div>
+				<AutoComplete
+					hintText="Item Name"
+					searchText={item.category}
+					onUpdateInput={this.onCategoryChange}
+					dataSource={categories.map(c=>c.name)}
+					filter={(searchText, key) => (key.indexOf(searchText) !== -1)}
+					openOnFocus={true}/>
+					{children}
+			</div>
+		)
+	}
+}
+
+class PriceStep extends React.Component{
+	onCategoryChange = (category)=>{
+		let {index, item} = this.props;
+		let newItem = Object.assign(this.props.item, {category});
+		this.props.onChange(newItem, index);
+	}
+
+	render(){
+		let {item, children} = this.props;
+		let numberInputStyle = {
+			maxWidth: 100
+		}
+		return(
+			<div>
+					<TextField
+						type="number"
+						name="price"
+						floatingLabelText="Price"
+						value={item.price}
+						onChange={this.onChange}
+						style={numberInputStyle}/>
+					<TextField
+						type="number"
+						name="amount"
+						floatingLabelText="Amount"
+						value={item.amount}
+						onChange={this.onChange}
+						style={numberInputStyle}/>
+					{children}
+				</div>
+		)
+	}
+}
 class ItemForm extends React.Component{
+	state = {
+    finished: false,
+    stepIndex: 0,
+  };
+
+  handleNext = () => {
+    const {stepIndex} = this.state;
+    this.setState({
+      stepIndex: stepIndex + 1,
+      finished: stepIndex >= 2,
+    });
+  };
+
+  handlePrev = () => {
+    const {stepIndex} = this.state;
+    if (stepIndex > 0) {
+      this.setState({stepIndex: stepIndex - 1});
+    }
+	};
+
+	getStepContent(stepIndex) {
+		let navButtons = <div>
+												<RaisedButton label="back" onClick={this.handlePrev}/>
+												<RaisedButton label="next" onClick={this.handleNext} primary={true}/>
+										</div>
+    switch (stepIndex) {
+      case 0:
+        return <NameStep {...this.props}>{navButtons}</NameStep>
+      case 1:
+			return <CategoryStep {...this.props}>{navButtons}</CategoryStep>
+      case 2:
+			return <PriceStep {...this.props}>{navButtons}</PriceStep>
+      default:
+        return 'You\'re a long way from home sonny jim!';
+    }
+	}
+
 	onChange = (e)=>{
 		let {index, item} = this.props;
 		let obj = {}
@@ -18,39 +143,31 @@ class ItemForm extends React.Component{
 		let newItem = Object.assign(this.props.item, obj);
 		this.props.onChange(newItem, index);
 	}
-	onNameChange = (name)=>{
-		let {index, item} = this.props;
-		let newItem = Object.assign(this.props.item, {name});
-		this.props.onChange(newItem, index);
-	}
+
 	destroy = ()=>{
 		this.props.onDestroy(this.props.index);
 	}
-	valid = ()=>{
-		let {name,price,amount} = this.props.item;
-		return name && name.length > 0 && price > 0 && amount >= 1
-	}
 	render(){
 		let {item, articleNames} = this.props;
-		let numberInputStyle = {
-			maxWidth: 100
-		}
+		let stepIndex = this.state.stepIndex;
 		return (
-			<div className={`ItemForm ${this.valid() ? 'valid':'invalid'}`}>
+			<div className="ItemForm">
 				<img src={Minus} alt='' onClick={this.destroy} className="ItemForm-destroy"/>
 				{/* <TextField name="name" floatingLabelText="Item Name" value={item.name} onChange={this.onChange}/> */}
-				<AutoComplete
-          hintText="Item Name"
-          searchText={item.name}
-					onUpdateInput={this.onNameChange}
-					name='name'
-          dataSource={articleNames}
-          filter={(searchText, key) => (key.indexOf(searchText) !== -1)}
-          openOnFocus={true}
-        />
+
 				<div>
-					<TextField type="number" name="price" floatingLabelText="Price" value={item.price} onChange={this.onChange} style={numberInputStyle}/>
-					<TextField type="number" name="amount" floatingLabelText="Amount" value={item.amount} onChange={this.onChange} style={numberInputStyle}/>
+					<Stepper activeStep={stepIndex}>
+						<Step>
+							<StepLabel>Name</StepLabel>
+						</Step>
+						<Step>
+							<StepLabel>Category</StepLabel>
+						</Step>
+						<Step>
+							<StepLabel>Price</StepLabel>
+						</Step>
+					</Stepper>
+					{this.getStepContent(stepIndex)}
 				</div>
 
 				<Divider/>
@@ -125,11 +242,8 @@ class AddTransaction extends React.Component{
 		this.setState({articles});
 	}
 	getCategories = async ()=>{
-		let categories = Store.get('categories');
+		let categories = await Store.get('categories');
 		this.setState({categories})
-	}
-	getArticleNames = ()=>{
-		return this.state.articles.map(a=>a.name);
 	}
 
 	componentDidMount(){
@@ -137,7 +251,8 @@ class AddTransaction extends React.Component{
 		this.getCategories();
 	}
 	render(){
-		let {items, transactionName} = this.state;
+		let {items, transactionName, articles, categories} = this.state;
+		console.log(categories);
 		return(
 			<div className='AddTransaction'>
 				<Subheader>
@@ -153,7 +268,8 @@ class AddTransaction extends React.Component{
 						index={index}
 						onChange={this.onItemChange}
 						onDestroy={this.destroyItem}
-						articleNames={this.getArticleNames()}/>
+						articles={articles}
+						categories={categories}/>
 				))}
 				<ItemFormAdder onAdd={this.addItem}/>
 				<br/>
