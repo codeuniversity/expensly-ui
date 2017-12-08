@@ -14,7 +14,6 @@ class ItemForm extends React.Component{
 	onChange = (e)=>{
 		let {index, item} = this.props;
 		let obj = {}
-		console.log(e)
 		obj[e.target.name] = e.target.value;
 		let newItem = Object.assign(this.props.item, obj);
 		this.props.onChange(newItem, index);
@@ -62,7 +61,7 @@ class ItemForm extends React.Component{
 
 class ItemFormAdder extends React.Component{
 	onItemAdd = ()=>{
-		let emptyItem = {name:'', amount:1, price: '', article_id: ''}
+		let emptyItem = {name:'', amount:1, price: '', article:'', category: ''}
 		this.props.onAdd(emptyItem);
 	}
 
@@ -78,6 +77,7 @@ class AddTransaction extends React.Component{
 		items:[{name:'', amount:1, price: '', article_id: ''}],
 		transactionName:'',
 		articles: [],
+		categories:[],
 	}
 
 	onItemChange = (newItem, index)=>{
@@ -93,6 +93,7 @@ class AddTransaction extends React.Component{
 
 	destroyItem = (index)=>{
 		let items = this.state.items.slice();
+		console.log(index, items);
 		items.splice(index, 1);
 		this.setState({items});
 	}
@@ -123,13 +124,17 @@ class AddTransaction extends React.Component{
 		let articles = await Store.get('articles');
 		this.setState({articles});
 	}
-
+	getCategories = async ()=>{
+		let categories = Store.get('categories');
+		this.setState({categories})
+	}
 	getArticleNames = ()=>{
 		return this.state.articles.map(a=>a.name);
 	}
 
 	componentDidMount(){
 		this.getArticles();
+		this.getCategories();
 	}
 	render(){
 		let {items, transactionName} = this.state;
@@ -145,6 +150,7 @@ class AddTransaction extends React.Component{
 					<ItemForm
 						key={index}
 						item={item}
+						index={index}
 						onChange={this.onItemChange}
 						onDestroy={this.destroyItem}
 						articleNames={this.getArticleNames()}/>
