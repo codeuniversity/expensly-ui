@@ -19,10 +19,25 @@ class NameStep extends React.Component{
 
 	onNameChange = (name)=>{
 		let {index, item} = this.props;
-		let newItem = Object.assign(this.props.item, {name});
+		let newItem = Object.assign(this.props.item, {article: name});
 		this.props.onChange(newItem, index);
 	}
-
+	valid = ()=>{
+		let {item} = this.props;
+		return !item.article;
+	}
+	handleNext = ()=>{
+		let {articles, item, index} = this.props;
+		let knownArticle = articles.filter(a=>a.name === item.article);
+		if (knownArticle.length >= 1) {
+			let knowInfo = {category_id: knownArticle[0].category.id, article_id: knownArticle[0].id};
+			let newItem = Object.assign(item, knowInfo);
+			this.props.onChange(newItem, index);
+			this.props.handleNext(2);
+		}else{
+			this.props.handleNext(1);
+		}
+	}
 	render(){
 		let {articles, item, children} = this.props;
 
@@ -30,12 +45,15 @@ class NameStep extends React.Component{
 			<div>
 				<AutoComplete
 					hintText="Item Name"
-					searchText={item.name}
+					searchText={item.article}
 					onUpdateInput={this.onNameChange}
 					dataSource={articles.map(a=>a.name)}
 					filter={(searchText, key) => (key.indexOf(searchText) !== -1)}
 					openOnFocus={true}/>
-					{children}
+					<div>
+						{/* <RaisedButton label="back" onClick={this.props.handlePrev}/> */}
+						<RaisedButton label="next" onClick={this.handleNext} primary={true} disabled={this.valid()}/>
+					</div>
 			</div>
 		)
 	}
@@ -47,29 +65,51 @@ class CategoryStep extends React.Component{
 		let newItem = Object.assign(this.props.item, {category});
 		this.props.onChange(newItem, index);
 	}
-
+	valid = ()=>{
+		let {item} = this.props;
+		return !item.category;
+	}
+	handleNext = ()=>{
+		let {categories, item, index} = this.props;
+		let knownCategory = categories.filter(c=>c.name === item.category);
+		if (knownCategory.length >= 1) {
+			let knowInfo = {category_id: knownCategory[0].id};
+			let newItem = Object.assign(item, knowInfo);
+			this.props.onChange(newItem, index);
+		}
+		this.props.handleNext();
+	}
 	render(){
 		let {item, categories, children} = this.props;
 		return(
 			<div>
 				<AutoComplete
-					hintText="Item Name"
+					hintText="Item Category"
 					searchText={item.category}
 					onUpdateInput={this.onCategoryChange}
 					dataSource={categories.map(c=>c.name)}
 					filter={(searchText, key) => (key.indexOf(searchText) !== -1)}
 					openOnFocus={true}/>
-					{children}
+					<div>
+						<RaisedButton label="back" onClick={this.props.handlePrev}/>
+						<RaisedButton label="next" onClick={this.handleNext} primary={true} disabled={this.valid()}/>
+					</div>
 			</div>
 		)
 	}
 }
 
 class PriceStep extends React.Component{
-	onCategoryChange = (category)=>{
+	onChange = (e)=>{
 		let {index, item} = this.props;
-		let newItem = Object.assign(this.props.item, {category});
+		let obj = {}
+		obj[e.target.name] = e.target.value;
+		let newItem = Object.assign(item, obj);
 		this.props.onChange(newItem, index);
+	}
+	valid = ()=>{
+		let {item} = this.props;
+		return !(item.price && item.amount);
 	}
 
 	render(){
@@ -93,7 +133,10 @@ class PriceStep extends React.Component{
 						value={item.amount}
 						onChange={this.onChange}
 						style={numberInputStyle}/>
-					{children}
+					<div>
+						<RaisedButton label="back" onClick={this.props.handlePrev}/>
+						{/* <RaisedButton label="save" onClick={this.props.handleSave} primary={true} disabled={this.valid()}/> */}
+					</div>
 				</div>
 		)
 	}
@@ -104,10 +147,10 @@ class ItemForm extends React.Component{
     stepIndex: 0,
   };
 
-  handleNext = () => {
+  handleNext = (steps = 1) => {
     const {stepIndex} = this.state;
     this.setState({
-      stepIndex: stepIndex + 1,
+      stepIndex: stepIndex + steps,
       finished: stepIndex >= 2,
     });
   };
@@ -120,17 +163,14 @@ class ItemForm extends React.Component{
 	};
 
 	getStepContent(stepIndex) {
-		let navButtons = <div>
-												<RaisedButton label="back" onClick={this.handlePrev}/>
-												<RaisedButton label="next" onClick={this.handleNext} primary={true}/>
-										</div>
+
     switch (stepIndex) {
       case 0:
-        return <NameStep {...this.props}>{navButtons}</NameStep>
+        return <NameStep {...this.props} handleNext={this.handleNext}/>
       case 1:
-			return <CategoryStep {...this.props}>{navButtons}</CategoryStep>
+			return <CategoryStep {...this.props} handleNext={this.handleNext} handlePrev={this.handlePrev}/>
       case 2:
-			return <PriceStep {...this.props}>{navButtons}</PriceStep>
+			return <PriceStep {...this.props} handlePrev={this.handlePrev}/>
       default:
         return 'You\'re a long way from home sonny jim!';
     }
@@ -195,6 +235,7 @@ class AddTransaction extends React.Component{
 		transactionName:'',
 		articles: [],
 		categories:[],
+		isSaving: false,
 	}
 
 	onItemChange = (newItem, index)=>{
@@ -210,7 +251,6 @@ class AddTransaction extends React.Component{
 
 	destroyItem = (index)=>{
 		let items = this.state.items.slice();
-		console.log(index, items);
 		items.splice(index, 1);
 		this.setState({items});
 	}
@@ -230,7 +270,7 @@ class AddTransaction extends React.Component{
 		let items = this.state.items;
 		let hasValid = false;
 		items.forEach(item=>{
-			if(item.name && item.price && item.amount){
+			if(item.article && item.price && item.amount){
 				hasValid = true;
 			}
 		});
@@ -250,15 +290,47 @@ class AddTransaction extends React.Component{
 		this.getArticles();
 		this.getCategories();
 	}
+	handleSave = async ()=>{
+		this.setState({isSaving: true});
+		let {items, transactionName} = this.state;
+		let transaction = await Store.post('transactions',{name:transactionName});
+		let savedItemPromises =  items.map(async (item)=>{
+			let category;
+			if (item.category_id) {
+				category = {id:item.category_id};
+			}else{
+				category = await Store.post('categories', {name: item.category});
+			}
+
+			let article;
+			if(item.article_id){
+				article = {id: item.article_id};
+			}else{
+				article = await Store.post('articles', {name: item.article, category_id: category.id});
+			}
+
+			let itemToSave = {price:item.price,amount:item.amount, article_id:article.id};
+			return Store.post(`transactions/${transaction.id}/items`, itemToSave);
+		});
+		await Promise.all(savedItemPromises);
+		this.props.history.push('/');
+		this.props.history.goForward();
+	}
+	isSaveable = ()=>{
+		return (this.hasValidItems() && this.state.transactionName && !this.isSaving)
+	}
 	render(){
 		let {items, transactionName, articles, categories} = this.state;
-		console.log(categories);
 		return(
 			<div className='AddTransaction'>
-				<Subheader>
+				<Subheader style={{minHeight:80, height:'auto'}}>
 					<div style={{float:'right'}}>
+						<TextField
+							floatingLabelText="Transaction name"
+							value={transactionName}
+							onChange={(e)=>{this.setState({transactionName:e.target.value})}}/>
 						<span style={{marginRight:10}}>{utils.moneyFormat(this.totalPrice())}</span>
-						<RaisedButton disabled={!this.hasValidItems()} label="save expense" primary={true}/>
+						<RaisedButton disabled={!this.isSaveable()} label="save expense" primary={true} onClick={this.handleSave}/>
 					</div>
 				</Subheader>
 				{items.map((item, index)=>(
