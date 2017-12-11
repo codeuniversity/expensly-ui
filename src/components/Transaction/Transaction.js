@@ -28,7 +28,7 @@ class Transaction extends React.Component{
 		console.log(items);
 		console.log(showingItems);
 		return(
-			<div className='Transaction'>
+			<div className={`Transaction ${className || ''}`}>
 
 				<h3>{transaction.name} <span className="light">{transaction.category}</span></h3>
 

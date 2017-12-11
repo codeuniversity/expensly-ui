@@ -5,7 +5,6 @@ import TextField  from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import Subheader from '../Subheader/Subheader';
 import utils from '../../utils';
-import ContentAdd from 'material-ui/svg-icons/content/add';
 import Plus from './plus.svg';
 import Minus from './minus.svg';
 import Store from '../../services/Store';
@@ -19,7 +18,7 @@ class NameStep extends React.Component{
 
 	onNameChange = (name)=>{
 		let {index, item} = this.props;
-		let newItem = Object.assign(this.props.item, {article: name});
+		let newItem = Object.assign(item, {article: name});
 		this.props.onChange(newItem, index);
 	}
 	valid = ()=>{
@@ -39,7 +38,7 @@ class NameStep extends React.Component{
 		}
 	}
 	render(){
-		let {articles, item, children} = this.props;
+		let {articles, item} = this.props;
 
 		return(
 			<div>
@@ -51,7 +50,6 @@ class NameStep extends React.Component{
 					filter={(searchText, key) => (key.indexOf(searchText) !== -1)}
 					openOnFocus={true}/>
 					<div>
-						{/* <RaisedButton label="back" onClick={this.props.handlePrev}/> */}
 						<RaisedButton label="next" onClick={this.handleNext} primary={true} disabled={this.valid()}/>
 					</div>
 			</div>
@@ -62,7 +60,7 @@ class NameStep extends React.Component{
 class CategoryStep extends React.Component{
 	onCategoryChange = (category)=>{
 		let {index, item} = this.props;
-		let newItem = Object.assign(this.props.item, {category});
+		let newItem = Object.assign(item, {category});
 		this.props.onChange(newItem, index);
 	}
 	valid = ()=>{
@@ -80,7 +78,7 @@ class CategoryStep extends React.Component{
 		this.props.handleNext();
 	}
 	render(){
-		let {item, categories, children} = this.props;
+		let {item, categories} = this.props;
 		return(
 			<div>
 				<AutoComplete
@@ -113,7 +111,7 @@ class PriceStep extends React.Component{
 	}
 
 	render(){
-		let {item, children} = this.props;
+		let {item} = this.props;
 		let numberInputStyle = {
 			maxWidth: 100
 		}
@@ -180,7 +178,7 @@ class ItemForm extends React.Component{
 		let {index, item} = this.props;
 		let obj = {}
 		obj[e.target.name] = e.target.value;
-		let newItem = Object.assign(this.props.item, obj);
+		let newItem = Object.assign(item, obj);
 		this.props.onChange(newItem, index);
 	}
 
@@ -188,7 +186,6 @@ class ItemForm extends React.Component{
 		this.props.onDestroy(this.props.index);
 	}
 	render(){
-		let {item, articleNames} = this.props;
 		let stepIndex = this.state.stepIndex;
 		return (
 			<div className="ItemForm">

@@ -1,7 +1,6 @@
 import React from 'react';
 import './Item.css';
 import utils from '../../utils'
-import Divider from 'material-ui/Divider';
 
 class Item extends React.Component{
 	render(){
