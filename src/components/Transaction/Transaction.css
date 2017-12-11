@@ -6,3 +6,7 @@
   margin-top: 0;
   text-align: right;
 }
+.Transaction-Itemlist{
+  max-width: 400px;
+  margin: auto;
+}
