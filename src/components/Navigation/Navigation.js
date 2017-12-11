@@ -3,6 +3,7 @@ import './Navigation.css';
 import Store from '../../services/Store';
 import {NavLink,withRouter} from 'react-router-dom';
 import Drawer from 'material-ui/Drawer';
+import Categories from '../Categories/Categories'
 
 
 class Navigation extends React.Component{
@@ -45,16 +46,25 @@ class Navigation extends React.Component{
                 </NavLink>
               </div>
               <div className="menu-item">
+              <NavLink
+                to="/add"
+                exact={true}
+                activeClassName="mobile-active-link"
+                className="nav-link Profile"
+                onClick={this.handleClose}>
+                Add an Expense
+              </NavLink>
+            </div>
+            <div className="menu-item">
                 <NavLink
-                  to="/add"
+                  to="/categories"
                   exact={true}
                   activeClassName="mobile-active-link"
                   className="nav-link Profile"
                   onClick={this.handleClose}>
-                  Add an Expense
+                  Categories
                 </NavLink>
               </div>
-
               <div className="menu-item">
               <NavLink
                 to="/logout"
@@ -76,6 +86,9 @@ class Navigation extends React.Component{
               </NavLink>
               <NavLink to="/add" exact={true} activeClassName="active-link" className="nav-link Profile">
                 Add an Expense
+              </NavLink>
+              <NavLink to="/categories" exact={true} activeClassName="active-link" className="nav-link Profile">
+                Categories
               </NavLink>
               <NavLink to="/logout" exact={true} activeClassName="active-link" className="nav-link Profile">
                 <div onClick={this.onLogout}>Logout</div>

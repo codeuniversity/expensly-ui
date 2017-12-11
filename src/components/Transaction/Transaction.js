@@ -30,7 +30,7 @@ class Transaction extends React.Component{
 		return(
 			<div className={`Transaction ${className || ''}`}>
 
-				<h3>{transaction.name} <span className="light">{transaction.category}</span></h3>
+				<h2>{transaction.name} <span className="light">{transaction.category}</span></h2>
 
 				{!showingItems ?
 				<div>
